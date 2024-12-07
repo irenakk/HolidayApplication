@@ -1,0 +1,62 @@
+plugins {
+	// Плагин для поддержки Java
+	id 'java'
+	// Плагин для поддержки Spring Boot
+	id 'org.springframework.boot' version '3.3.1'
+	// Плагин для управления зависимостями Spring
+	id 'io.spring.dependency-management' version '1.1.6'
+}
+
+// Группа и версия проекта
+group = 'com.example'
+version = '0.0.1-SNAPSHOT'
+
+// Настройки Java
+java {
+	// Установка версии языка Java
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(22)
+	}
+}
+
+// Конфигурации
+configurations {
+	// Конфигурация для компиляции только аннотаций
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+// Репозитории
+repositories {
+	// Центральный репозиторий Maven
+	mavenCentral()
+}
+
+// Зависимости
+dependencies {
+	// Зависимости для Spring Boot
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
+
+	// Зависимости для Lombok
+	compileOnly 'org.projectlombok:lombok'
+	runtimeOnly 'com.mysql:mysql-connector-j:9.1.0'
+	annotationProcessor 'org.projectlombok:lombok'
+
+	// Зависимости для тестирования
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'org.springframework.security:spring-security-test'
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+	// Зависимость для Spring Data JPA
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+}
+
+// Задачи
+tasks.named('test') {
+	// Использование JUnit Platform для тестирования
+	useJUnitPlatform()
+}

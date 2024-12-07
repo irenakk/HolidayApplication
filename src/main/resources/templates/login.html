@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="https://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Праздник! Праздник! Праздник!</title>
+    <link crossorigin="anonymous" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
+          integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" rel="stylesheet">
+    <style>
+        .container-wrapper {
+            width: 100%;
+            max-width: 1300px;
+            margin: 4rem auto auto;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .form-group input {
+            width: 300px;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</head>
+
+<body>
+<div class="container-wrapper">
+    <blockquote class="blockquote text-center">
+        <h1>Компания "Праздник! Праздник! Праздник!"</h1>
+        <h2 class="mt-5">Вход</h2>
+        <div class="container">
+            <form class="form-group mt-4" method="post" th:action="@{/login}">
+                <div class="mb-3 form-group">
+                    <label for="username">Ник пользователя:</label>
+                    <input class="form-control" id="username" name="username" type="text"/>
+                </div>
+                <div class="mb-3 form-group">
+                    <label for="password">Пароль:</label>
+                    <input class="form-control" id="password" name="password" type="password"/>
+                </div>
+                <button class="btn btn-primary" type="submit">Войти</button>
+            </form>
+        </div>
+        <button class="btn btn-outline-primary mt-3" data-bs-target="#addUserModal" data-bs-toggle="modal"
+                type="button">Зарегистрироваться
+        </button>
+    </blockquote>
+</div>
+
+<!-- Модальное окно для регистрации -->
+<div aria-hidden="true" aria-labelledby="addUserModalLabel" class="modal fade" id="addUserModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addUserModalLabel">Регистрация</h5>
+                <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addUserForm" method="post" th:action="@{/register}" th:object="${user}">
+                    <div class="mb-3">
+                        <label for="nameRegister">ФИО*</label>
+                        <input class="form-control" id="nameRegister" required th:field="*{name}" type="text"/>
+                    </div>
+                    <div class="mb-3">
+                        <label for="usernameRegister">Ник пользователя*</label>
+                        <input class="form-control" id="usernameRegister" required th:field="*{username}" type="text"/>
+                    </div>
+                    <div class="mb-3">
+                        <label for="passwordRegister">Пароль*</label>
+                        <input class="form-control" id="passwordRegister" required th:field="*{password}"
+                               type="password"/>
+                    </div>
+                    <div class="mb-3">
+                        <label for="confirmPasswordRegister">Подтверждение пароля*</label>
+                        <input class="form-control" id="confirmPasswordRegister" onkeyup='check();' required
+                               type="password"/>
+                        <span id='message'></span>
+                    </div>
+                    <div class="mb-3">
+                        <label for="phoneRegister">Телефон*</label>
+                        <input class="form-control" id="phoneRegister" required th:field="*{phone}" type="tel"/>
+                    </div>
+                    <div class="mb-3">
+                        <label for="emailRegister">Почта*</label>
+                        <input class="form-control" id="emailRegister" required th:field="*{email}" type="email"/>
+                    </div>
+                    <button class="btn btn-primary" type="submit">Зарегистрироваться</button>
+                    <script type="text/javascript">
+                        var check = function () {
+                            if (document.getElementById('passwordRegister').value === document.getElementById('confirmPasswordRegister').value) {
+                                document.getElementById('message').style.color = 'green';
+                                document.getElementById('message').innerHTML = 'Совпадают';
+                            } else {
+                                document.getElementById('message').style.color = 'red';
+                                document.getElementById('message').innerHTML = 'Не совпадают';
+                            }
+                        }
+                    </script>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

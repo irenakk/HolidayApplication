@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Клиенты | Праздник! Праздник! Праздник!</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    /* Хэдер */
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px;
+      border-bottom: 1px solid #ddd;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .header-title {
+      flex: 1;
+      display: flex;
+      align-items: center;
+    }
+
+    .header-title a {
+      text-decoration: none;
+      color: black;
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    .header-nav {
+      flex: 2;
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      align-items: center;
+    }
+
+    .header-nav a {
+      text-decoration: none;
+      color: black;
+      font-size: 16px;
+    }
+
+    .header-buttons {
+      flex: 1;
+      display: flex;
+      gap: 20px;
+      justify-content: flex-end;
+      align-items: center;
+    }
+
+    .header-buttons a {
+      text-decoration: none;
+      color: black;
+      font-size: 16px;
+    }
+
+    /* Тело страницы */
+
+    .content-wrapper {
+      width: 100%;
+      max-width: 1300px;
+      margin: auto;
+      overflow: auto;
+    }
+
+    .page-title {
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .control-panel {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+      margin-bottom: 1rem;
+    }
+
+    .add-button {
+      flex: 1;
+    }
+
+    .search-block {
+      flex: 2;
+      display: flex;
+      justify-content: center;
+    }
+
+    .search-input-group {
+      display: flex;
+      gap: 10px;
+    }
+
+    .search-input {
+      height: 38px;
+      padding-left: 10px;
+    }
+
+    .count {
+      margin-left: 1rem;
+      color: black;
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</head>
+
+<!-- Хэдер -->
+<header class="header">
+  <div class="header-title">
+    <a href="/">Праздник! Праздник! Праздник!</a>
+  </div>
+  <nav class="header-nav">
+    <a href="/clients">Клиенты</a>
+    <a href="/venues">Площадки</a>
+    <a href="/events">Мероприятия</a>
+    <a href="/users" id="usersButton">Сотрудники</a>
+    <a href="/about">Об авторе</a>
+  </nav>
+  <div class="header-buttons">
+    <a href="/logout">Выход</a>
+  </div>
+</header>
+
+<body>
+<div class="content-wrapper my-4">
+  <h1 class="page-title">Панель управления клиентами</h1>
+
+  <!-- Управляющая панель: кнопка добавления + поиск -->
+  <div class="control-panel">
+    <div class="add-button">
+      <button id="addClientButton" class="btn btn-success" onclick="openAddClientModal()">Добавить клиента</button>
+    </div>
+
+    <div class="search-block">
+      <div class="search-input-group">
+        <input type="text" id="searchKeyword" class="search-input" placeholder="Поиск клиента">
+        <button id="searchButton" class="btn btn-outline-primary">Поиск</button>
+        <input type="button" class="btn btn-outline-warning" value="Очистить" id="btnClear" onclick="clearSearch()"/>
+      </div>
+    </div>
+
+    <div style="flex: 1;"></div>
+  </div>
+
+  <!-- Таблица клиентов -->
+  <table class="table table-hover">
+    <thead>
+    <tr>
+      <th>ID</th>
+      <th>
+        ФИО
+        <a href="#" id="sortAsc" class="text-decoration-none">&#9650;</a>
+        <a href="#" id="sortDesc" class="text-decoration-none">&#9660;</a>
+      </th>
+      <th>Email</th>
+      <th>Телефон</th>
+      <th>Компания</th>
+    </tr>
+    </thead>
+    <tbody id="clientTableBody">
+    <!-- Динамическое добавление строк -->
+    </tbody>
+  </table>
+
+  <!-- Отображение количества клиентов -->
+  <p class="count">
+    <span id="clientCount">Количество клиентов в таблице: 0</span>
+  </p>
+</div>
+
+<!-- Модальное окно для добавления/редактирования -->
+<div class="modal fade" id="clientModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="clientModalLabel">Добавить/редактировать клиента</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+      </div>
+      <div class="modal-body">
+        <form id="clientForm">
+          <input type="hidden" id="clientId">
+          <div class="mb-3">
+            <label for="clientName" class="form-label">ФИО*</label>
+            <input type="text" id="clientName" class="form-control" required>
+          </div>
+          <div class="mb-3">
+            <label for="clientEmail" class="form-label">Email*</label>
+            <input type="email" id="clientEmail" class="form-control" required>
+          </div>
+          <div class="mb-3">
+            <label for="clientPhone" class="form-label">Телефон*</label>
+            <input type="text" id="clientPhone" class="form-control" required>
+          </div>
+          <div class="mb-3">
+            <label for="clientCompany" class="form-label">Компания</label>
+            <input type="text" id="clientCompany" class="form-control">
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="submit" class="btn btn-primary" onclick="saveClient()">Сохранить</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Модальное окно для удаления -->
+<div class="modal fade" id="deleteConfirmationModal" tabindex="-1" aria-labelledby="deleteConfirmationModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteConfirmationModalLabel">Подтверждение удаления</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        Вы уверены, что хотите удалить этого клиента?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+        <button type="button" class="btn btn-danger" id="confirmDeleteButton">Удалить</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const clientApiUrl = '/api/clients'; // URL для API клиентов
+  const clientTableBody = document.getElementById('clientTableBody'); // Тело таблицы для отображения клиентов
+  let currentSort = null; // Текущий параметр сортировки
+  let currentUser = null; // Текущий пользователь
+
+  // Функция для загрузки текущего пользователя
+  function loadCurrentUser() {
+    fetch('/api/users/currentUser').then(response => {
+      if (response.ok) {
+        return response.json();
+      }
+      throw new Error('Ошибка загрузки информации о пользователе.');
+    }).then(user => {
+      currentUser = user;
+      checkUserRoles();
+      loadClients();
+    }).catch(error => {
+      alert(error.message);
+    });
+  }
+
+  loadCurrentUser();
+
+  // Функция для проверки ролей пользователя
+  function checkUserRoles() {
+    const addClientButton = document.getElementById('addClientButton');
+    if (currentUser && Array.from(currentUser.roles).map(role => role.name).includes('ROLE_VIEWER')) {
+      addClientButton.style.display = 'none';
+    }
+    const usersButton = document.getElementById('usersButton');
+    if (currentUser && !Array.from(currentUser.roles).map(role => role.name).includes('ROLE_ADMIN')) {
+      usersButton.style.display = 'none';
+    }
+  }
+
+  // Функция для загрузки клиентов
+  function loadClients(keyword = '', sort = null) {
+    const url = new URL(clientApiUrl, window.location.origin);
+    if (keyword) url.searchParams.append('keyword', keyword);
+    if (sort) url.searchParams.append('sort', sort);
+
+    // Добавляем уникальный параметр, чтобы избежать кеширования
+    url.searchParams.append('_', Date.now());
+
+    fetch(url).then(response => {
+      if (!response.ok) {
+        throw new Error(`Ошибка загрузки клиентов: ${response.status}`);
+      }
+      return response.json();
+    }).then(data => {
+      clientTableBody.innerHTML = ''; // Очищаем таблицу
+      if (data.length === 0) {
+        clientTableBody.innerHTML = `<tr><td colspan="6" class="text-center">Клиенты не найдены</td></tr>`;
+        updateClientCount(0);
+        return;
+      }
+      data.forEach(client => {
+        const row =
+                `<tr>
+                   <td>${client.id}</td>
+                    <td>${client.name}</td>
+                    <td>${client.email}</td>
+                    <td>${client.phone}</td>
+                    <td>${client.company || ''}</td>
+                    <td>
+                      ${currentUser && !Array.from(currentUser.roles).map(role => role.name).includes('ROLE_VIEWER')
+                        ? `<button class="btn btn-outline-info" onclick="editClient(${client.id})">Редактировать</button>` : ''}
+                      ${currentUser && Array.from(currentUser.roles).map(role => role.name).includes('ROLE_ADMIN')
+                        ? `<button class="btn btn-outline-danger" onclick="deleteClient(${client.id})">Удалить</button>` : ''}
+                    </td>
+                </tr>`;
+        clientTableBody.innerHTML += row;
+        updateClientCount(data.length);
+      });
+    }).catch(() => {
+      alert('Не удалось загрузить список клиентов.');
+    });
+  }
+
+  // Функция для обновления количества клиентов
+  function updateClientCount(count) {
+    document.getElementById('clientCount').textContent = `Количество клиентов в таблице: ${count}`;
+  }
+
+  // Обработчик события для кнопки поиска
+  document.getElementById('searchButton').addEventListener('click', () => {
+    const keyword = document.getElementById('searchKeyword').value;
+    loadClients(keyword, currentSort);
+  });
+
+  // Обработчики событий для кнопок сортировки
+  document.getElementById('sortAsc').addEventListener('click', () => {
+    currentSort = 'a_to_z';
+    loadClients(document.getElementById('searchKeyword').value, currentSort);
+  });
+
+  document.getElementById('sortDesc').addEventListener('click', () => {
+    currentSort = 'z_to_a';
+    loadClients(document.getElementById('searchKeyword').value, currentSort);
+  });
+
+  // Функция для открытия модального окна добавления клиента
+  function openAddClientModal() {
+    document.getElementById('clientForm').reset(); // Сбрасываем форму
+    document.getElementById('clientId').value = ''; // Очищаем ID клиента
+    document.getElementById('clientModalLabel').textContent = 'Добавление клиента'; // Меняем заголовок
+    new bootstrap.Modal(document.getElementById('clientModal')).show();
+  }
+
+  // Функция для редактирования клиента
+  function editClient(id) {
+    fetch(`${clientApiUrl}/${id}`).then(response => response.json()).then(client => {
+      document.getElementById('clientId').value = client.id;
+      document.getElementById('clientName').value = client.name;
+      document.getElementById('clientEmail').value = client.email;
+      document.getElementById('clientPhone').value = client.phone;
+      document.getElementById('clientCompany').value = client.company;
+      document.getElementById('clientModalLabel').textContent = 'Редактирование клиента'; // Меняем заголовок
+      new bootstrap.Modal(document.getElementById('clientModal')).show();
+    });
+  }
+
+  // Функция для сохранения клиента
+  function saveClient() {
+    const client = {
+      id: document.getElementById('clientId').value || null,
+      name: document.getElementById('clientName').value.trim(),
+      email: document.getElementById('clientEmail').value.trim(),
+      phone: document.getElementById('clientPhone').value.trim(),
+      company: document.getElementById('clientCompany').value.trim()
+    };
+
+    // Проверка на пустые поля
+    if (!client.name || !client.email || !client.phone) {
+      alert('Пожалуйста, заполните все обязательные поля.');
+      return;
+    }
+
+    fetch(clientApiUrl + (client.id ? `/${client.id}` : ''), {
+      method: client.id ? 'PUT' : 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(client)
+    }).then(response => {
+      if (!response.ok) {
+        return response.json().then(() => {
+          throw new Error(`Ошибка сохранения: ${response.status}`);
+        });
+      }
+      return response.json();
+    }).then(() => {
+      const clientModal = bootstrap.Modal.getInstance(document.getElementById('clientModal'));
+      if (clientModal) clientModal.hide();
+      clearSearch();
+      loadClients(); // Перезагрузить список клиентов
+    }).catch(() => {
+      alert('Ошибка сохранения клиента. Проверьте данные и попробуйте снова.');
+    });
+  }
+
+  // Функция для удаления клиента
+  function deleteClient(id) {
+    currentDeleteId = id;
+    let deleteModal = new bootstrap.Modal(document.getElementById('deleteConfirmationModal'));
+    deleteModal.show();
+  }
+
+  // Обработчик события для кнопки подтверждения удаления
+  document.getElementById('confirmDeleteButton').addEventListener('click', function () {
+    if (currentDeleteId) {
+      fetch(`${clientApiUrl}/${currentDeleteId}`, { method: 'DELETE' }).then(response => {
+        if (response.ok) {
+          alert('Клиент успешно удален!');
+          loadClients();
+        } else {
+          alert('Не удалось удалить клиента.');
+        }
+      }).then(() => {
+        const deleteConfirmationModal = bootstrap.Modal.getInstance(document.getElementById('deleteConfirmationModal'));
+        if (deleteConfirmationModal) deleteConfirmationModal.hide();
+        loadClients(); // Перезагрузить список клиентов
+      }).catch(() => {
+        alert('Произошла ошибка. Попробуйте еще раз.');
+      });
+    }
+  });
+
+  loadClients();
+
+  // Функция для очистки поиска
+  function clearSearch() {
+    window.location="[[@{/clients}]]";
+  }
+</script>
+</body>
+</html>

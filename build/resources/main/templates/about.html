@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Об авторе | Праздник! Праздник! Праздник!</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+  <style>
+    /* Хэдер */
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px;
+      border-bottom: 1px solid #ddd;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .header-title {
+      flex: 1;
+      display: flex;
+      align-items: center;
+    }
+
+    .header-title a {
+      text-decoration: none;
+      color: black;
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    .header-nav {
+      flex: 2;
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      align-items: center;
+    }
+
+    .header-nav a {
+      text-decoration: none;
+      color: black;
+      font-size: 16px;
+    }
+
+    .header-buttons {
+      flex: 1;
+      display: flex;
+      gap: 20px;
+      justify-content: flex-end;
+      align-items: center;
+    }
+
+    .header-buttons a {
+      text-decoration: none;
+      color: black;
+      font-size: 16px;
+    }
+
+    /* Тело страницы */
+
+    .content-wrapper {
+      width: 100%;
+      max-width: 700px;
+      margin: auto;
+      overflow: auto;
+    }
+
+    .author-info {
+      text-decoration: none;
+      color: black;
+      font-size: 28px;
+    }
+
+    .justify-text {
+      text-align: justify;
+      text-decoration: none;
+      color: black;
+      font-size: 22px;
+    }
+  </style>
+</head>
+
+<!-- Хэдер -->
+<header class="header">
+  <div class="header-title">
+    <a href="/">Праздник! Праздник! Праздник!</a>
+  </div>
+  <nav class="header-nav">
+    <a href="/clients">Клиенты</a>
+    <a href="/venues">Площадки</a>
+    <a href="/events">Мероприятия</a>
+    <a href="/users" id="usersButton">Сотрудники</a>
+    <a href="/about">Об авторе</a>
+  </nav>
+  <div class="header-buttons">
+    <a href="/logout">Выход</a>
+  </div>
+</header>
+
+<body>
+<div class="content-wrapper my-4">
+  <div class="text-center">
+    <h1>Об авторе</h1>
+    <p class="author-info my-4">
+      Калиева Ирэна Сергеевна, ПИ22-2в <br>
+      222762@edu.fa.ru <br>
+      Даты работы над проектом: 15.10 - 07.12 2024 года
+    </p>
+    <p class="justify-text">
+      <br>
+      Работаю мобильным разработчиком с 2023 года в проекте <a href="https://luuk.media">LUUK</a>.
+      Также занимаюсь frontend разработкой с 16 лет, разработала несколько сайтов для интернет-магазинов.<br><br>
+      Познакомилась с программированием в 13 лет на курсах по изучению Python.
+      Знакомство с Java начала с начала 2024 года благодаря занятиям в Финансовом Университете.
+      В рамках этого проекта работала с множеством новых технологий, например, Spring Boot, ORM, RESTful API.
+    </p>
+  </div>
+</div>
+<script>
+  let currentUser = null;
+
+  // Функция для загрузки текущего пользователя
+  function loadCurrentUser() {
+    fetch('/api/users/currentUser').then(response => {
+      if (response.ok) {
+        return response.json();
+      }
+      throw new Error('Ошибка загрузки информации о пользователе.');
+    }).then(user => {
+      currentUser = user;
+      checkUserRoles();
+    }).catch(error => {
+      alert(error.message);
+    });
+  }
+
+  loadCurrentUser();
+
+  // Функция для проверки ролей пользователя
+  function checkUserRoles() {
+    const usersButton = document.getElementById('usersButton');
+    if (currentUser && !Array.from(currentUser.roles).map(role => role.name).includes('ROLE_ADMIN')) {
+      usersButton.style.display = 'none';
+    }
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Мероприятия | Праздник! Праздник! Праздник!</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* Хэдер */
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            border-bottom: 1px solid #ddd;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-title {
+            flex: 1;
+            display: flex;
+            align-items: center;
+        }
+
+        .header-title a {
+            text-decoration: none;
+            color: black;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .header-nav {
+            flex: 2;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .header-nav a {
+            text-decoration: none;
+            color: black;
+            font-size: 16px;
+        }
+
+        .header-buttons {
+            flex: 1;
+            display: flex;
+            gap: 20px;
+            justify-content: flex-end;
+            align-items: center;
+        }
+
+        .header-buttons a {
+            text-decoration: none;
+            color: black;
+            font-size: 16px;
+        }
+
+        /* Тело страницы */
+
+        .content-wrapper {
+            width: 100%;
+            max-width: 1600px;
+            margin: auto;
+            overflow: auto;
+        }
+
+        .page-title {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .control-panel {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 1rem;
+        }
+
+        .add-button {
+            flex: 1;
+        }
+
+        .search-block {
+            flex: 2;
+            display: flex;
+            justify-content: center;
+        }
+
+        .search-input-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .search-input {
+            height: 38px;
+            padding-left: 10px;
+        }
+
+        .count {
+            margin-left: 1rem;
+            color: black;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</head>
+
+<!-- Хэдер -->
+<header class="header">
+    <div class="header-title">
+        <a href="/">Праздник! Праздник! Праздник!</a>
+    </div>
+    <nav class="header-nav">
+        <a href="/clients">Клиенты</a>
+        <a href="/venues">Площадки</a>
+        <a href="/events">Мероприятия</a>
+        <a href="/users" id="usersButton">Сотрудники</a>
+        <a href="/about">Об авторе</a>
+    </nav>
+    <div class="header-buttons">
+        <a href="/logout">Выход</a>
+    </div>
+</header>
+
+<body>
+<div class="content-wrapper my-4">
+    <h1 class="page-title">Панель управления мероприятиями</h1>
+
+    <!-- Управляющая панель: кнопка добавления + поиск -->
+    <div class="control-panel">
+        <div class="add-button">
+            <button id="addEventButton" class="btn btn-success" onclick="openAddEventModal()">Добавить мероприятие</button>
+        </div>
+
+        <div class="search-block">
+            <div class="search-input-group">
+                <input type="text" id="searchKeyword" class="search-input" placeholder="Поиск мероприятия">
+                <button id="searchButton" class="btn btn-outline-primary">Поиск</button>
+                <input type="button" class="btn btn-outline-warning" value="Очистить" id="btnClear" onclick="clearSearch()"/>
+            </div>
+        </div>
+
+        <div style="flex: 1;text-align: end;">
+            <a href="/events/chart" style="text-decoration: none;">
+                <button type="button" class="btn btn-outline-secondary">Статистические данные</button>
+            </a>
+        </div>
+    </div>
+
+    <!-- Таблица мероприятий -->
+    <table class="table table-hover">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>
+                Название
+                <a href="#" id="sortTitleAsc" class="text-decoration-none">&#9650;</a>
+                <a href="#" id="sortTitleDesc" class="text-decoration-none">&#9660;</a>
+            </th>
+            <th>
+                Дата
+                <a href="#" id="sortDateAsc" class="text-decoration-none">&#9650;</a>
+                <a href="#" id="sortDateDesc" class="text-decoration-none">&#9660;</a>
+            </th>
+            <th>
+                Бюджет
+                <a href="#" id="sortBudgetAsc" class="text-decoration-none">&#9650;</a>
+                <a href="#" id="sortBudgetDesc" class="text-decoration-none">&#9660;</a>
+            </th>
+            <th>
+                Статус
+                <a href="#" id="sortStatusAsc" class="text-decoration-none">&#9650;</a>
+                <a href="#" id="sortStatusDesc" class="text-decoration-none">&#9660;</a>
+            </th>
+            <th>Заказчик</th>
+            <th>Площадка</th>
+            <th>Менеджер</th>
+        </tr>
+        </thead>
+        <tbody id="eventTableBody">
+        <!-- Динамическое добавление строк -->
+        </tbody>
+    </table>
+
+    <!-- Отображение количества мероприятий -->
+    <p class="count">
+        <span id="eventCount">Количество мероприятий в таблице: 0</span>
+    </p>
+</div>
+
+<!-- Модальное окно для добавления/редактирования -->
+<div class="modal fade" id="eventModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="eventModalLabel">Добавить/редактировать мероприятие</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+            </div>
+            <div class="modal-body">
+                <form id="eventForm">
+                    <input type="hidden" id="eventId">
+                    <div class="mb-3">
+                        <label for="eventTitle" class="form-label">Название*</label>
+                        <input type="text" id="eventTitle" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="eventDate" class="form-label">Дата мероприятия*</label>
+                        <input type="datetime-local" id="eventDate" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="eventBudget" class="form-label">Бюджет*</label>
+                        <input type="number" id="eventBudget" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="eventStatus" class="form-label">Статус мероприятия*</label>
+                        <input type="text" id="eventStatus" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="eventClient" class="form-label">Заказчик*</label>
+                        <select class="form-select" id="eventClient" required>
+                            <option value="" disabled selected>Выберите заказчика</option>
+                            <!-- Заказчики будут динамически добавлены здесь -->
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="eventVenue" class="form-label">Площадка*</label>
+                        <select class="form-select" id="eventVenue" required>
+                            <option value="" disabled selected>Выберите площадку</option>
+                            <!-- Площадки будут динамически добавлены здесь -->
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="eventManager" class="form-label">Менеджер*</label>
+                        <select class="form-select" id="eventManager" required>
+                            <option value="" disabled selected>Выберите менеджера</option>
+                            <!-- Менеджеры будут динамически добавлены здесь -->
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-primary" onclick="saveEvent()">Сохранить</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно для удаления -->
+<div class="modal fade" id="deleteConfirmationModal" tabindex="-1" aria-labelledby="deleteConfirmationModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteConfirmationModalLabel">Подтверждение удаления</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Вы уверены, что хотите удалить это мероприятие?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteButton">Удалить</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const eventApiUrl = '/api/events'; // URL для API мероприятий
+    const eventTableBody = document.getElementById('eventTableBody'); // Тело таблицы для отображения мероприятий
+    let currentSort = null; // Текущий параметр сортировки
+    let currentUser = null; // Текущий пользователь
+
+    // Функция для загрузки текущего пользователя
+    function loadCurrentUser() {
+        fetch('/api/users/currentUser').then(response => {
+            if (response.ok) {
+                return response.json();
+            }
+            throw new Error('Ошибка загрузки информации о пользователе.');
+        }).then(user => {
+            currentUser = user;
+            checkUserRoles();
+            loadEvents();
+            loadClients();
+            loadVenues();
+            loadManagers();
+        }).catch(error => {
+            alert(error.message);
+        });
+    }
+
+    loadCurrentUser();
+
+    // Функция для проверки ролей пользователя
+    function checkUserRoles() {
+        const addEventButton = document.getElementById('addEventButton');
+        if (currentUser && Array.from(currentUser.roles).map(role => role.name).includes('ROLE_VIEWER')) {
+            addEventButton.style.display = 'none';
+        }
+        const usersButton = document.getElementById('usersButton');
+        if (currentUser && !Array.from(currentUser.roles).map(role => role.name).includes('ROLE_ADMIN')) {
+            usersButton.style.display = 'none';
+        }
+    }
+
+    // Функция для загрузки мероприятий
+    function loadEvents(keyword = '', sort = null) {
+        const url = new URL(eventApiUrl, window.location.origin);
+        if (keyword) url.searchParams.append('keyword', keyword);
+        if (sort) url.searchParams.append('sort', sort);
+
+        // Добавляем уникальный параметр, чтобы избежать кеширования
+        url.searchParams.append('_', Date.now());
+
+        fetch(url).then(response => {
+            if (!response.ok) {
+                throw new Error(`Ошибка загрузки мероприятий: ${response.status}`);
+            }
+            return response.json();
+        }).then(data => {
+            eventTableBody.innerHTML = ''; // Очищаем таблицу
+            if (data.length === 0) {
+                eventTableBody.innerHTML = `<tr><td colspan="9" class="text-center">Мероприятия не найдены</td></tr>`;
+                updateEventCount(0);
+                return;
+            }
+            data.forEach(event => {
+                const row =
+                    `<tr>
+                       <td>${event.id}</td>
+                       <td>${event.title}</td>
+                       <td>${event.date.toString().replace('T', ' ')}</td>
+                       <td>${event.budget}</td>
+                       <td>${event.status}</td>
+                       <td>${event.client ? event.client.name : 'Неизвестный заказчик'}</td>
+                       <td>${event.venue ? event.venue.name : 'Неизвестная площадка'}</td>
+                       <td>${event.manager ? event.manager.name : 'Неизвестный менеджер'}</td>
+                       <td>
+                         ${currentUser && !Array.from(currentUser.roles).map(role => role.name).includes('ROLE_VIEWER')
+                        ? `<button class="btn btn-outline-info" onclick="editEvent(${event.id})">Редактировать</button>` : ''}
+                         ${currentUser && Array.from(currentUser.roles).map(role => role.name).includes('ROLE_ADMIN')
+                        ? `<button class="btn btn-outline-danger" onclick="deleteEvent(${event.id})">Удалить</button>` : ''}
+                       </td>
+                    </tr>`;
+                eventTableBody.innerHTML += row;
+                updateEventCount(data.length);
+            });
+        }).catch(() => {
+            alert('Не удалось загрузить список мероприятий.');
+        });
+    }
+
+    // Функция для обновления количества мероприятий
+    function updateEventCount(count) {
+        document.getElementById('eventCount').textContent = `Количество мероприятий в таблице: ${count}`;
+    }
+
+    // Обработчик события для кнопки поиска
+    document.getElementById('searchButton').addEventListener('click', () => {
+        const keyword = document.getElementById('searchKeyword').value;
+        loadEvents(keyword, currentSort);
+    });
+
+    // Обработчики событий для кнопок сортировки
+    document.getElementById('sortTitleAsc').addEventListener('click', () => {
+        currentSort = 'title_a_to_z';
+        loadEvents(document.getElementById('searchKeyword').value, currentSort);
+    });
+
+    document.getElementById('sortTitleDesc').addEventListener('click', () => {
+        currentSort = 'title_z_to_a';
+        loadEvents(document.getElementById('searchKeyword').value, currentSort);
+    });
+
+    document.getElementById('sortDateAsc').addEventListener('click', () => {
+        currentSort = 'new_to_old';
+        loadEvents(document.getElementById('searchKeyword').value, currentSort);
+    });
+
+    document.getElementById('sortDateDesc').addEventListener('click', () => {
+        currentSort = 'old_to_new';
+        loadEvents(document.getElementById('searchKeyword').value, currentSort);
+    });
+
+    document.getElementById('sortBudgetAsc').addEventListener('click', () => {
+        currentSort = 'cheap_to_expensive';
+        loadEvents(document.getElementById('searchKeyword').value, currentSort);
+    });
+
+    document.getElementById('sortBudgetDesc').addEventListener('click', () => {
+        currentSort = 'expensive_to_cheap';
+        loadEvents(document.getElementById('searchKeyword').value, currentSort);
+    });
+
+    document.getElementById('sortStatusAsc').addEventListener('click', () => {
+        currentSort = 'status_a_to_z';
+        loadEvents(document.getElementById('searchKeyword').value, currentSort);
+    });
+
+    document.getElementById('sortStatusDesc').addEventListener('click', () => {
+        currentSort = 'status_z_to_a';
+        loadEvents(document.getElementById('searchKeyword').value, currentSort);
+    });
+
+    // Функция для открытия модального окна добавления мероприятия
+    function openAddEventModal() {
+        document.getElementById('eventForm').reset(); // Сбрасываем форму
+        document.getElementById('eventId').value = ''; // Очищаем ID мероприятия
+        document.getElementById('eventModalLabel').textContent = 'Добавление мероприятия'; // Меняем заголовок
+        new bootstrap.Modal(document.getElementById('eventModal')).show();
+    }
+
+    // Функция для редактирования мероприятия
+    function editEvent(id) {
+        fetch(`${eventApiUrl}/${id}`).then(response => response.json()).then(event => {
+            document.getElementById('eventId').value = event.id;
+            document.getElementById('eventTitle').value = event.title;
+            document.getElementById('eventDate').value = event.date;
+            document.getElementById('eventBudget').value = event.budget;
+            document.getElementById('eventStatus').value = event.status;
+            document.getElementById('eventClient').value = event.client ? event.client.id : '';
+            document.getElementById('eventVenue').value = event.venue ? event.venue.id : '';
+            document.getElementById('eventManager').value = event.manager ? event.manager.id : '';
+            document.getElementById('eventModalLabel').textContent = 'Редактирование мероприятия'; // Меняем заголовок
+            new bootstrap.Modal(document.getElementById('eventModal')).show();
+        });
+    }
+
+    // Функция для сохранения мероприятия
+    function saveEvent() {
+        const event = {
+            id: document.getElementById('eventId').value || null,
+            title: document.getElementById('eventTitle').value.trim(),
+            date: document.getElementById('eventDate').value.trim(),
+            budget: document.getElementById('eventBudget').value.trim(),
+            status: document.getElementById('eventStatus').value.trim(),
+            client: { id: document.getElementById('eventClient').value },
+            venue: { id: document.getElementById('eventVenue').value },
+            manager: { id: document.getElementById('eventManager').value }
+        };
+
+        // Проверка на пустые поля
+        if (!event.title || !event.date || !event.budget || !event.status || !event.client.id || !event.venue.id || !event.manager.id) {
+            alert('Пожалуйста, заполните все обязательные поля.');
+            return;
+        }
+
+        fetch(eventApiUrl + (event.id ? `/${event.id}` : ''), {
+            method: event.id ? 'PUT' : 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(event)
+        }).then(response => {
+            if (!response.ok) {
+                return response.json().then(() => {
+                    throw new Error(`Ошибка сохранения: ${response.status}`);
+                });
+            }
+            return response.json();
+        }).then(() => {
+            const eventModal = bootstrap.Modal.getInstance(document.getElementById('eventModal'));
+            if (eventModal) eventModal.hide();
+            clearSearch();
+            loadEvents(); // Перезагрузить список мероприятий
+        }).catch(() => {
+            alert('Ошибка сохранения мероприятия. Проверьте данные и попробуйте снова.');
+        });
+    }
+
+    // Функция для удаления мероприятия
+    function deleteEvent(id) {
+        currentDeleteId = id;
+        let deleteModal = new bootstrap.Modal(document.getElementById('deleteConfirmationModal'));
+        deleteModal.show();
+    }
+
+    // Обработчик события для кнопки подтверждения удаления
+    document.getElementById('confirmDeleteButton').addEventListener('click', function () {
+        if (currentDeleteId) {
+            fetch(`${eventApiUrl}/${currentDeleteId}`, { method: 'DELETE' }).then(response => {
+                if (response.ok) {
+                    alert('Мероприятие успешно удалено!');
+                    loadEvents();
+                } else {
+                    alert('Не удалось удалить мероприятие.');
+                }
+            }).then(() => {
+                const deleteConfirmationModal = bootstrap.Modal.getInstance(document.getElementById('deleteConfirmationModal'));
+                if (deleteConfirmationModal) deleteConfirmationModal.hide();
+                loadEvents(); // Перезагрузить список мероприятий
+            }).catch(() => {
+                alert('Произошла ошибка. Попробуйте еще раз.');
+            });
+        }
+    });
+
+    // Функция для загрузки заказчиков
+    function loadClients() {
+        fetch('/api/events/clients').then(response => {
+            if (response.ok) {
+                return response.json();
+            }
+            throw new Error('Ошибка загрузки заказчиков.');
+        }).then(clients => {
+            const clientSelect = document.getElementById('eventClient');
+            clients.forEach(client => {
+                const option = document.createElement('option');
+                option.value = client.id;
+                option.textContent = client.name;
+                clientSelect.appendChild(option);
+            });
+        }).catch(error => {
+            alert(error.message);
+        });
+    }
+
+    // Функция для загрузки площадок
+    function loadVenues() {
+        fetch('/api/events/venues').then(response => {
+            if (response.ok) {
+                return response.json();
+            }
+            throw new Error('Ошибка загрузки площадок.');
+        }).then(venues => {
+            const venueSelect = document.getElementById('eventVenue');
+            venues.forEach(venue => {
+                const option = document.createElement('option');
+                option.value = venue.id;
+                option.textContent = venue.name;
+                venueSelect.appendChild(option);
+            });
+        }).catch(error => {
+            alert(error.message);
+        });
+    }
+
+    // Функция для загрузки менеджеров
+    function loadManagers() {
+        fetch('/api/events/managers').then(response => {
+            if (response.ok) {
+                return response.json();
+            }
+            throw new Error('Ошибка загрузки менеджеров.');
+        }).then(managers => {
+            const managerSelect = document.getElementById('eventManager');
+            managers.forEach(manager => {
+                const option = document.createElement('option');
+                option.value = manager.id;
+                option.textContent = manager.name;
+                managerSelect.appendChild(option);
+            });
+        }).catch(error => {
+            alert(error.message);
+        });
+    }
+
+    loadEvents();
+
+    // Функция для очистки поиска
+    function clearSearch() {
+        window.location="[[@{/events}]]";
+    }
+</script>
+</body>
+</html>

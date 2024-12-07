@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Праздник! Праздник! Праздник!</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <style>
+        /* Хэдер */
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            border-bottom: 1px solid #ddd;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-title {
+            flex: 1;
+            display: flex;
+            align-items: center;
+        }
+
+        .header-title a {
+            text-decoration: none;
+            color: black;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .header-nav {
+            flex: 2;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .header-nav a {
+            text-decoration: none;
+            color: black;
+            font-size: 16px;
+        }
+
+        .header-buttons {
+            flex: 1;
+            display: flex;
+            gap: 20px;
+            justify-content: flex-end;
+            align-items: center;
+        }
+
+        .header-buttons a {
+            text-decoration: none;
+            color: black;
+            font-size: 16px;
+        }
+
+
+        /* Галерея */
+
+        .gallery {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        .gallery-item {
+            height: 450px;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        .gallery-item img {
+            height: 100%;
+            display: block;
+        }
+
+        .gallery-item .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            opacity: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.3s ease-in-out;
+            font-size: 16px;
+            padding: 10px;
+        }
+
+        .gallery-item:hover .overlay {
+            opacity: 1;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</head>
+
+<!-- Хэдер -->
+<header class="header">
+    <div class="header-title">
+        <a href="/">Праздник! Праздник! Праздник!</a>
+    </div>
+    <nav class="header-nav">
+        <a href="/clients">Клиенты</a>
+        <a href="/venues">Площадки</a>
+        <a href="/events">Мероприятия</a>
+        <a href="/users" id="usersButton">Сотрудники</a>
+        <a href="/about">Об авторе</a>
+    </nav>
+    <div class="header-buttons">
+        <a href="#userProfileModal" data-bs-toggle="modal">Личный кабинет</a>
+        <a href="/logout">Выход</a>
+    </div>
+</header>
+
+<body>
+<div class="mt-4 text-center">
+    <h1>Компания "Праздник! Праздник! Праздник!"</h1>
+</div>
+
+<!-- Галерея -->
+<div class="gallery">
+    <div class="gallery-item">
+        <img th:src="@{/images/event_1.jpg}" alt="1">
+        <div class="overlay">
+            "Пикник в тропическом стиле"<br><br>
+            Яркая зелень, деревянные акценты и легкие ткани подчеркивают летнее настроение.
+        </div>
+    </div>
+    <div class="gallery-item">
+        <img th:src="@{/images/event_2.jpg}" alt="2">
+        <div class="overlay">
+            "Свадьба под открытым небом: гармония природы и элегантности"<br><br>
+            Зеленые гирлянды и воздушные ткани создают сказочную атмосферу.
+        </div>
+    </div>
+    <div class="gallery-item">
+        <img th:src="@{/images/event_3.jpg}" alt="3">
+        <div class="overlay">
+            "День медитации в саду"<br><br>
+            Пространство для расслабления под навесами из тканей и в окружении природы.
+        </div>
+    </div>
+    <div class="gallery-item">
+        <img th:src="@{/images/event_4.jpg}" alt="4">
+        <div class="overlay">
+            "Летний садовый вечер под балдахинами"<br><br>
+            Пространство утопает в зелени и мягком свете, идеальное место для отдыха.
+        </div>
+    </div>
+    <div class="gallery-item">
+        <img th:src="@{/images/event_5.jpg}" alt="5">
+        <div class="overlay">
+            "Мастер-класс по созданию венков из летних цветов"<br><br>
+            Ткани на потолке, окружение зелени и аромат свежих растений.
+        </div>
+    </div>
+    <div class="gallery-item">
+        <img th:src="@{/images/event_6.jpg}" alt="6">
+        <div class="overlay">
+            "Летний гала-ужин в эко-стиле"<br><br>
+            Декор из натуральных материалов и ткани, которые нежно колышутся на ветру.
+        </div>
+    </div>
+    <div class="gallery-item">
+        <img th:src="@{/images/event_7.jpg}" alt="7">
+        <div class="overlay">
+            "Романтический ужин в оазисе из зелени"<br><br>
+            Свечи, мягкий свет и тропическая атмосфера под балдахином.
+        </div>
+    </div>
+    <div class="gallery-item">
+        <img th:src="@{/images/event_8.jpg}" alt="8">
+        <div class="overlay">
+            "Уютный уголок для чтения"<br><br>
+            Подвесные ткани создают прохладную тень, а зелень обнимает пространство.
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно для личного кабинета -->
+<div class="modal fade" id="userProfileModal" tabindex="-1" aria-labelledby="userProfileModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="userProfileModalLabel">Личный кабинет</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="userProfileForm">
+                    <input type="hidden" id="userId">
+                    <div class="mb-3">
+                        <label for="userName" class="form-label">ФИО*</label>
+                        <input type="text" id="userName" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="userUsername" class="form-label">Никнейм</label>
+                        <input type="text" id="userUsername" class="form-control" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label for="userPassword" class="form-label">Пароль*</label>
+                        <input type="password" id="userPassword" class="form-control">
+                    </div>
+                    <div class="mb-3">
+                        <label for="userConfirmPassword" class="form-label">Подтверждение пароля*</label>
+                        <input type="password" id="userConfirmPassword" class="form-control" onkeyup='checkPasswords()'>
+                        <span id='message'></span>
+                    </div>
+                    <div class="mb-3">
+                        <label for="userPhone" class="form-label">Телефон*</label>
+                        <input type="tel" id="userPhone" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="userEmail" class="form-label">Почта*</label>
+                        <input type="email" id="userEmail" class="form-control" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                <button type="button" class="btn btn-primary" onclick="saveUserProfile()">Сохранить</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const userApiUrl = '/api/users';
+    let currentUser = null;
+
+    // Функция для загрузки текущего пользователя
+    function loadCurrentUser() {
+        fetch('/api/users/currentUser').then(response => {
+            if (response.ok) {
+                return response.json();
+            }
+            throw new Error('Ошибка загрузки информации о пользователе.');
+        }).then(user => {
+            currentUser = user;
+            checkUserRoles();
+            fillUserProfileForm();
+        }).catch(error => {
+            alert(error.message);
+        });
+    }
+
+    // Функция для проверки ролей пользователя
+    function checkUserRoles() {
+        const usersButton = document.getElementById('usersButton');
+        if (currentUser && !Array.from(currentUser.roles).map(role => role.name).includes('ROLE_ADMIN')) {
+            usersButton.style.display = 'none';
+        }
+    }
+
+    // Функция для заполнения формы профиля пользователя
+    function fillUserProfileForm() {
+        if (currentUser) {
+            document.getElementById('userId').value = currentUser.id;
+            document.getElementById('userName').value = currentUser.name;
+            document.getElementById('userUsername').value = currentUser.username;
+            document.getElementById('userPassword').value = currentUser.password;
+            document.getElementById('userConfirmPassword').value = currentUser.password;
+            document.getElementById('userPhone').value = currentUser.phone;
+            document.getElementById('userEmail').value = currentUser.email;
+        }
+    }
+
+    // Функция для сохранения профиля пользователя
+    function saveUserProfile() {
+        const user = {
+            id: document.getElementById('userId').value || null,
+            name: document.getElementById('userName').value.trim(),
+            username: document.getElementById('userUsername').value.trim(),
+            password: document.getElementById('userPassword').value.trim(),
+            phone: document.getElementById('userPhone').value.trim(),
+            email: document.getElementById('userEmail').value.trim(),
+            roles: currentUser.roles
+        };
+
+        // Проверка на пустые поля
+        if (!user.name || !user.username || !user.password || !user.phone || !user.email) {
+            alert('Пожалуйста, заполните все обязательные поля.');
+            return;
+        }
+
+        // Проверка на совпадение паролей
+        if (user.password && user.password !== document.getElementById('userConfirmPassword').value.trim()) {
+            alert('Пароли не совпадают.');
+            return;
+        }
+
+        fetch(userApiUrl + (user.id ? `/${user.id}` : ''), {
+            method: user.id ? 'PUT' : 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(user)
+        }).then(response => {
+            if (!response.ok) {
+                return response.json().then(error => {
+                    throw new Error(`Ошибка сохранения: ${response.status}`);
+                });
+            }
+            return response.json();
+        }).then(() => {
+            const userProfileModal = bootstrap.Modal.getInstance(document.getElementById('userProfileModal'));
+            if (userProfileModal) userProfileModal.hide();
+            loadCurrentUser();
+        }).catch(error => {
+            console.log(error);
+            alert('Ошибка сохранения сотрудника. Проверьте данные и попробуйте снова.');
+        });
+    }
+
+    // Функция для проверки совпадения паролей
+    function checkPasswords() {
+        const password = document.getElementById('userPassword').value;
+        const confirmPassword = document.getElementById('userConfirmPassword').value;
+        const message = document.getElementById('message');
+        if (password === confirmPassword) {
+            message.style.color = 'green';
+            message.textContent = 'Пароли совпадают';
+        } else {
+            message.style.color = 'red';
+            message.textContent = 'Пароли не совпадают';
+        }
+    }
+
+    loadCurrentUser();
+</script>
+</body>
+</html>

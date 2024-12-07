@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Гистограмма | Праздник! Праздник! Праздник!</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    /* Хэдер */
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px;
+      border-bottom: 1px solid #ddd;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .header-title {
+      flex: 1;
+      display: flex;
+      align-items: center;
+    }
+
+    .header-title a {
+      text-decoration: none;
+      color: black;
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    .header-nav {
+      flex: 2;
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      align-items: center;
+    }
+
+    .header-nav a {
+      text-decoration: none;
+      color: black;
+      font-size: 16px;
+    }
+
+    .header-buttons {
+      flex: 1;
+      display: flex;
+      gap: 20px;
+      justify-content: flex-end;
+      align-items: center;
+    }
+
+    .header-buttons a {
+      text-decoration: none;
+      color: black;
+      font-size: 16px;
+    }
+
+    /* Тело страницы */
+
+    .content-wrapper {
+      width: 100%;
+      max-width: 1300px;
+      margin: auto;
+      overflow: auto;
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<!-- Хэдер -->
+<header class="header">
+  <div class="header-title">
+    <a href="/">Праздник! Праздник! Праздник!</a>
+  </div>
+  <nav class="header-nav">
+    <a href="/clients">Клиенты</a>
+    <a href="/venues">Площадки</a>
+    <a href="/events">Мероприятия</a>
+    <a href="/users" id="usersButton">Сотрудники</a>
+    <a href="/about">Об авторе</a>
+  </nav>
+  <div class="header-buttons">
+    <a href="/logout">Выход</a>
+  </div>
+</header>
+
+<body>
+<div class="content-wrapper my-4">
+  <div class="text-center">
+    <h1>Статистические данные мероприятий</h1>
+    <h4>Количество мероприятий в день</h4>
+  </div>
+
+  <!-- Гистограмма -->
+  <canvas id="eventsChart" width="400" height="200"></canvas>
+
+  <script>
+    let currentUser = null;
+
+    // Функция для загрузки текущего пользователя
+    function loadCurrentUser() {
+      fetch('/api/users/currentUser').then(response => {
+        if (response.ok) {
+          return response.json();
+        }
+        throw new Error('Ошибка загрузки информации о пользователе.');
+      }).then(user => {
+        currentUser = user;
+        checkUserRoles();
+      }).catch(error => {
+        alert(error.message);
+      });
+    }
+
+    loadCurrentUser();
+
+    // Функция для проверки ролей пользователя
+    function checkUserRoles() {
+      const usersButton = document.getElementById('usersButton');
+      if (currentUser && !Array.from(currentUser.roles).map(role => role.name).includes('ROLE_ADMIN')) {
+        usersButton.style.display = 'none';
+      }
+    }
+
+    // Функция для получения данных мероприятий
+    async function fetchEvents() {
+      const response = await fetch('/api/events/chart');
+      if (!response.ok) {
+        alert('Ошибка загрузки данных');
+      }
+      return response.json();
+    }
+
+    // Функция для группировки мероприятий по дате
+    function groupEventsByDate(events) {
+      const dateMap = {};
+      events.forEach(event => {
+        const dateKey = new Date(event.date).toISOString().split('T')[0];
+        if (dateMap[dateKey]) {
+          dateMap[dateKey] += 1;
+        } else {
+          dateMap[dateKey] = 1;
+        }
+      });
+      return dateMap;
+    }
+
+    // Функция для загрузки и отображения гистограммы
+    async function loadChart() {
+      const listEvents = await fetchEvents();
+      const groupedEvents = groupEventsByDate(listEvents);
+      const labels = Object.keys(groupedEvents);
+      const data = Object.values(groupedEvents);
+
+      const ctx = document.getElementById('eventsChart').getContext('2d');
+      const eventsChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Количество мероприятий',
+            data: data,
+            backgroundColor: 'rgb(0, 42, 255)',
+            borderColor: 'rgb(0, 42, 255)',
+            borderWidth: 1
+          }]
+        },
+        options: {
+          scales: {
+            x: {
+              ticks: {
+                color: 'black'
+              }
+            },
+            y: {
+              ticks: {
+                color: 'black'
+              },
+              beginAtZero: true
+            }
+          }
+        }
+      });
+    }
+
+    loadChart();
+  </script>
+</div>
+</body>
+</html>
